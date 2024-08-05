@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  
+  
+  
+  <entry>
+    <title>搭建 ESP8266 NodeMCU + Arduino 开发环境</title>
+    <link href="/6287fe0b/"/>
+    <url>/6287fe0b/</url>
+    
+    <content type="html"><![CDATA[<p>暑假闲得无聊在淘宝上买了个 ESP8266 NodeMCU 开发板，主要是它性能又好又不贵，信泰微电子这家店的 ESP8266 有时候活动只要 6 块钱就能拿下。</p><p><img src="https://pic.imgdb.cn/item/65aa308e871b83018a2943bd.png"></p><p>拿到手上就急着想试试了，看了看评论好像需要用 Arduino 开发（还需要学 C 语言 555 ）</p><h2 id="安装-Arduino"><a href="#安装-Arduino" class="headerlink" title="安装 Arduino"></a>安装 Arduino</h2><h3 id="Windows"><a href="#Windows" class="headerlink" title="Windows"></a>Windows</h3><p>前往官方<a href="https://www.arduino.cc/en/software">下载页面</a>下载最新版即可，一般只需要下载最新版的 <code>Win 10 and newer, 64 bits</code>，下好后双击打开一直下一步就行。</p><p><img src="https://pic.imgdb.cn/item/65aa30b9871b83018a29d649.png"></p><h3 id="Linux"><a href="#Linux" class="headerlink" title="Linux"></a>Linux</h3><p>一般的 Linux 发行版本依然需要前往官方<a href="https://www.arduino.cc/en/software">下载页面</a>，只需要下载最新版的 <code>AppImage 64 bits (X86-64)</code>，双击打开即可。</p><p><img src="https://pic.imgdb.cn/item/65aa30cf871b83018a2a226c.png"></p><p>而 Arch 可以直接使用 yay 安装</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">yay -S arduino-ide-bin<br></code></pre></td></tr></table></figure><h3 id="MacOS"><a href="#MacOS" class="headerlink" title="MacOS"></a>MacOS</h3><p>依然需要前往官方<a href="https://www.arduino.cc/en/software">下载页面</a>，按照对应条件下载安装包。</p><p><img src="https://pic.imgdb.cn/item/65aa30ee871b83018a2a9889.png"></p><h2 id="安装-CH340-驱动"><a href="#安装-CH340-驱动" class="headerlink" title="安装 CH340 驱动"></a>安装 CH340 驱动</h2><h3 id="Windows-MacOS"><a href="#Windows-MacOS" class="headerlink" title="Windows &amp; MacOS"></a>Windows &amp; MacOS</h3><p>Windows 官方驱动：<a href="https://www.wch.cn/download/CH341SER_EXE.html">https://www.wch.cn/download/CH341SER_EXE.html</a></p><p>MacOS 官方驱动：<a href="https://www.wch.cn/download/CH341SER_MAC_ZIP.html">https://www.wch.cn/download/CH341SER_MAC_ZIP.html</a></p><h3 id="Linux-1"><a href="#Linux-1" class="headerlink" title="Linux"></a>Linux</h3><p>较新的 Linux 内核已经内置了 CH340 的驱动，无需自行安装</p><h2 id="配置-Arduino"><a href="#配置-Arduino" class="headerlink" title="配置 Arduino"></a>配置 Arduino</h2><p>默认的 Arduino 不自带 ESP8266 的开发环境，需要手动安装。这一步是通用的，不区分操作系统。</p><p>首先先设置语言到中文，进入 Arduino，依次点击 <code>File =&gt; Preferences</code>，或者直接 Ctrl + , ，在 <code>Language</code> 选项中选择 <code>中文（简体）</code>，在点右下角的 <code>OK</code>，重新加载后便是中文界面了。</p><p><img src="https://pic.imgdb.cn/item/65aa312f871b83018a2b7eb8.png"></p><p>接下来在 <code>首选项</code> 的 <code>其他开发版管理器地址</code> 项中填入 <code>http://arduino.esp8266.com/stable/package_esp8266com_index.json</code>，然后 <code>确认</code>。</p><p>然后我们点击 <code>工具 =&gt; 开发板 =&gt; 开发板管理器</code>，并在输入框中输入 <code>ESP8266</code>，点击下面的 <code>安装</code>，等待下载（注意：据相关文献考证，有 99% 的概率会安装失败（，最简单的解决方法就是魔法上网。</p><p>接下来就可以插上你的开发板了，不会还有人不会插数据线吧（</p><p>现在 <code>工具 =&gt; 开发板 =&gt; esp8266</code>，选择 <code>NodeMCU 1.0(ESP-12E Module)</code>，<code>工具 =&gt; 端口</code> 选择唯一的那一个（如果你有两个开发板，建议先拔掉一个，以免搞混）</p><hr><p>如果你目前的操作系统是 Linux，看不见端口是正常现象，解决方法是执行以下命令：</p><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash"><span class="hljs-built_in">sudo</span> <span class="hljs-built_in">chmod</span> 777 /dev/ttyUSB0<br></code></pre></td></tr></table></figure><p>不过每次插上 ESP8266 都需要重新执行（Linux の痛）</p><h2 id="烧入手法（必读！！！）"><a href="#烧入手法（必读！！！）" class="headerlink" title="烧入手法（必读！！！）"></a>烧入手法（必读！！！）</h2><p>仔细观察你会发现，ESP8266 开发板上有两个按钮，分别是 <code>FLASH</code> 和 <code>RST</code>，在即将烧入代码之前，需要按住 <code>FLASH</code> 不松，然后按一下 <code>RST</code> 松手，此时 <code>FLASH</code> 还不能松，这时候点击 Arduino 左上角的<code>-&gt;</code>开始烧入，待到烧入完成后再松开 <code>FLASH</code></p><h2 id="测试"><a href="#测试" class="headerlink" title="测试"></a>测试</h2><p>安装 ESP8266 开发环境后，Arduino 里会有几个示例文件供我们测试。</p><p>点击 <code>文件 =&gt; 示例 =&gt; ESP8266</code>，选择 <code>Blink</code>，之后按照烧入手法烧入程序，你将看到你的开发板会一直闪烁亮蓝光，此时你已经配置好了，可以继续开发了！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术</category>
+      
+      <category>Arduino</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>ESP8266</tag>
+      
+      <tag>Arduino</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Noteonline 正式上线</title>
+    <link href="/6cc079cc/"/>
+    <url>/6cc079cc/</url>
+    
+    <content type="html"><![CDATA[<p>8 月 15 号，我花了一个下午的时间做了一个类似于<a href="https://note.ms/">Note.ms</a>的网站：</p><p><img src="https://pic.imgdb.cn/item/65aa324b871b83018a2f7a76.png"></p><p>它的名字叫 Noteonline（随便乱取的）。为什么要做呢？看看 Note.ms 现在的局势就知道了，各种脚本盘踞着各个页面，“毁灭计划”成员铺天盖地，稍不注意你的页面就会被清掉，根本来不及备份……</p><p>大丈夫岂能郁郁久居于他人之下！虽然也有其他类似 Note.ms 的网站，但还是自己的好!</p><p>接下来我遇到了一个问题，Github 上类似 Note.ms 的项目使用的都是 php，需要在服务器上部署，但我可是典型的白嫖怪，怎么可能有服务器，只好选择其他办法。正好我以前配置过<a href="https://waline.js.org/">Waline</a>评论系统，对<a href="https://leancloud.app/">LeanCloud</a>记忆犹深，脑海中便突然浮现出一个想法：能否使用 LeanCloud 来储存页面的数据，只用 Html 和 Js 实现网站功能？</p><p>理论可行，实践不再赘述，最后成功实现，目前功能如下：</p><ol><li>你可以在地址（<code>https://note.xshaw.xyz</code>）后任意添加内容来创建一个页面（不限制任何符号，甚至你还可以创建分页、中文链接，但一些特殊表示除外，比如<code>@info</code>）。</li><li>你可以任何页面中的编辑框里写笔记，你的笔记将会实时存储在云端，之后再访问你编辑过的页面便可再次看到你写的笔记。</li><li>你可以在一个页面的链接后面加上<code>@info</code>（根页面请加<code>/@info</code>）以查看该页面的创建时间、更新时间、更新者的一些信息（ip 地址等，所以请不要试图在这里散播违法内容！）、查看次数、编辑次数等。</li><li>支持夜间模式（其实是 Vue 内置的）。</li><li>统一使用鸿蒙字体（遥遥领先），引入了 <a href="https://github.com/vinta/pangu.js">Pangu.js</a>，刷新页面后会自动分割中英文，优化阅读体验。</li></ol><p>GitHub 仓库：<a href="https://github.com/imtgs/Noteonline/">&#x2F;imtgs&#x2F;Noteonline</a></p><p>地址是<a href="https://note.xshaw.xyz/">https://note.xshaw.xyz</a>，在这里感谢<a href="https://vercel.com/">Vercel</a>提供的免费托管服务</p><p>PPT 功能：</p><ol><li>支持 MD 语法</li><li>暂时想不出别的了</li></ol><p>欢迎在<a href="https://note.xshaw.xyz/">Noteonline</a>讨论区或这里的评论区报告 Bug 和申请新功能！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>技术</category>
+      
+      <category>前端</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Note.ms</tag>
+      
+      <tag>Noteonline</tag>
+      
+      <tag>LeanCloud</tag>
+      
+      <tag>Vercel</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>jsDelivr的替代品：渺软公益 CDN</title>
+    <link href="/8f913a4e/"/>
+    <url>/8f913a4e/</url>
+    
+    <content type="html"><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>众所周知，jsDelivr 是一个大名鼎鼎的静态资源 cdn 加速平台，它以免费、高速、支持 github 文件的特点而备受欢迎，但是，就目前国内网络环境来看，现在在国内使用它作为 cdn 并不理想，下面是几个 ping 测试结果图：</p><p><img src="https://pic.imgdb.cn/item/65aa32e0871b83018a31853b.png" alt="三大运营商综合测试，已经有接近1/3的省份瘫痪了"></p><p><img src="https://pic.imgdb.cn/item/65aa32f9871b83018a31e091.png" alt="电信单独测试也不理想"></p><p><img src="https://pic.imgdb.cn/item/65aa3324871b83018a327afe.png"></p><p><img src="https://pic.imgdb.cn/item/65aa3354871b83018a332bbc.png" alt="联通、移动几乎瘫痪"></p><p><img src="https://pic.imgdb.cn/item/65aa3371871b83018a339dde.png" alt="jsDelivr的另一个服务器在国内也比较慢"></p><p>综上所述，目前还在用 jsDelivr 的用户应该尽快更换其他 cdn！</p><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>渺软公益 CDN 正是在上述情况中催生的，以下是<a href="https://cdn.onmicrosoft.cn/">官网</a>的介绍：</p><blockquote><p>在开发者日常的开发和使用中，比如写某些简单的 Demo，或者开发一些小工具，小玩意的时候，总会使用到某些前端的静态库，当然 UNPKG、jsDelivr 这样的网站就是为此而生的。但是我们是一群中国的开发者，为此，国外服务商提供的种种服务让我们的网站体验一次次的降级，于是更多的静态资源被放在源站上，但是这仍然解决不了静态资源变慢的问题。于是，本项目出现了，由私人搭建的备案域名来使用 Dogecloud&nbsp;CDN，为开发者提供一个高速简单，开箱即用的公益 CDN，本项目的宗旨是：限制更少，更简单，只为开发 Just for Developers</p></blockquote><p>这是一款免费的 cdn，由<a href="https://icodeq.com/2022/5c18919d3591/index.html">Zkeq</a>大佬搭建，支持回源到 jsDelivr、UNPKG 和 cdnjs 上的任意内容，而且目前的请求限制高达单个域名<code>64GB/24h</code>！</p><p><img src="https://pic.imgdb.cn/item/65aa3390871b83018a341528.jpg"></p><p>而且速度也是相当快，以下为 ping 测试结果：</p><p><img src="https://pic.imgdb.cn/item/65aa33a9871b83018a347d6b.png"></p><p>全绿！</p><h2 id="替换方法"><a href="#替换方法" class="headerlink" title="替换方法"></a>替换方法</h2><p>替换方法非常简单，将你博客或项目中引用的 jsDelivr、UNPKG 或 cdnjs 的 cdn 链接的域名换成渺软公益 CDN 的就行，具体对照下表：</p><table><thead><tr><th align="center">cdn 平台</th><th align="center">跟换域名</th></tr></thead><tbody><tr><td align="center">jsDelivr</td><td align="center"><a href="https://jsd.onmicrosoft.cn/">https://jsd.onmicrosoft.cn</a></td></tr><tr><td align="center">UNPKG</td><td align="center"><a href="https://npm.onmicrosoft.cn/">https://npm.onmicrosoft.cn</a></td></tr><tr><td align="center">cdnjs</td><td align="center"><a href="https://cdnjs.onmicrosoft.cn/">https://cdnjs.onmicrosoft.cn</a></td></tr></tbody></table><p>比如我要使用渺软公益 CDN 来引用 jsDelivr 上的 jQuery，我就应该把<code>https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js</code>换成<code>https://jsd.onmicrosoft.cn/npm/jquery@3.6.4/dist/jquery.min.js</code></p><p>目前已经有许多小伙伴开始使用它了，就目前可观测数据来看，甚至有一个小时的 jsDelivr 请求数高达<code>5w+</code>次，我的博客目前也已开始使用。</p><p><img src="https://pic.imgdb.cn/item/65aa32ba871b83018a30fcf1.png"></p><p>现在就看这个 cdn 能用多久了，虽然是公益项目，但也是有规定的，Zkeq 明确表示请不要用它来托管私人静态图片、私人字体文件等大流量资源，还请大家不要滥用此 cdn，以免不必要的损失！</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>分享</category>
+      
+      <category>网站</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>jsDelivr</tag>
+      
+      <tag>CDN</tag>
+      
+      <tag>渺软公益</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>推荐一个Hexo主题：Stellar</title>
+    <link href="/2d84c422/"/>
+    <url>/2d84c422/</url>
+    
+    <content type="html"><![CDATA[<p>在某次虫洞穿越中（其实就是<a href="https://foreverblog.cn/">十年之约</a>的搞的<a href="http://foreverblog.cn/go.html">虫洞</a>，无聊的时候就用它在许多人的博客之间穿梭，你可以看到各式各样的博客、主页），我进入了<a href="https://blog.xsot.cn/">星辰日记</a>这个博客，一下子就被这种样式所吸引：</p><p><img src="https://pic.imgdb.cn/item/65aa33f4871b83018a35902e.png" alt="星辰日记"></p><p>后来……</p><p>我便抛弃了 VitePress，又用上了 Hexo（</p><h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>这款主题叫<a href="https://github.com/xaoxuu/hexo-theme-stellar">Stellar</a>（会看标题的都知道了吧），好像还和著名 Hexo 主题 Volantis 是一个作者，而且这款主题目前好像还没什么人气。</p><p>这款主题最吸引我的地方就是它的侧边栏，简洁大气，不像<a href="https://butterfly.js.org/">Butterfly</a>那样说不出的繁杂。</p><p>而且这种侧边栏巧妙地将导航栏结合，且可以高度自定义化，大量的空间留白和圆角给人一种舒适感。</p><p>其他的该有它都有，自带的标签甚至高达 32 种，自定义程度也极高，同时还独创了其它 Hexo 主题所没有的 Wiki 系统（虽然目前我还用不到）</p><p>官方文档：<a href="https://xaoxuu.com/wiki/stellar/#start">https://xaoxuu.com/wiki/stellar/#start</a></p><p><del>稍后我可能会出一期或一系列详细的 Hexo 搭建教程和这个主题的相关美化，敬请关注！</del>（现在我已经更换到了 Hugo，不想写了）</p>]]></content>
+    
+    
+    <categories>
+      
+      <category>分享</category>
+      
+      <category>主题</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>Hexo</tag>
+      
+      <tag>Stellar</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="/4a17b156/"/>
+    <url>/4a17b156/</url>
+    
+    <content type="html"><![CDATA[<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs js"><span class="hljs-variable language_">console</span>.<span class="hljs-title function_">log</span>(<span class="hljs-string">&quot;Hello, world!&quot;</span>);<br></code></pre></td></tr></table></figure><p>建博客快有两年了，期间换了很多主题、域名，尝试过自己写一个博客网站，遇到了许许多多的困难、也曾丢失了很多博客。</p><p>以下是近期改动:</p><ul><li>（2023 年 6 月 20 号）由于域名（<code>xshaw.top</code>）过期，我被迫又用上了 GitHub Pages 给的域名，也就是现在用的<code>imtgs.github.io</code>，我思来想去，决定再次用上 Jakyll，并且又用了曾经用过的主题 TMaize，这款主题曾经陪伴了我一些时光，久违了！</li><li>（2023 年 7 月 23 号）我正在摸索安装 archlinux，找到了一个文档网站，进去一眼就被这页面所诱惑，这不就是搭建博客的最好模板吗？！找了半天，终于知道这是用 VitePress 生成的，我迫不及待开始研究它，<del>现在你看到的网页就是由它生成的</del>。想装 arch 的可以看看这个网站，<a href="https://arch.icekylin.online/">archlinux 简明指南</a>，内容也很不错！</li><li>（2023 年 8 月 2 日）由于我这人爱折腾，VitePress 又过于文档化，我决定用上以前用过的 Hexo 来生成我的博客。</li><li>（时间未知）不知道为何用 Hexo 生成的博客文章列表不显示了，我思来想去决定试一试 Hugo。</li><li>（时间未知）用上了 VuePress，使用 reco 作为主题。</li><li>（2024 年 1 月 18 日）用回了 Hexo，使用 butterfly 作为主题。</li></ul><hr><p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p><h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo new <span class="hljs-string">&quot;My New Post&quot;</span><br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p><h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo server<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p><h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo generate<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p><h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><code class="hljs bash">$ hexo deploy<br></code></pre></td></tr></table></figure><p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>]]></content>
+    
+    
+    <categories>
+      
+      <category>杂谈</category>
+      
+    </categories>
+    
+    
+    <tags>
+      
+      <tag>GitHub</tag>
+      
+      <tag>Jakyll</tag>
+      
+      <tag>Arch</tag>
+      
+      <tag>VitePress</tag>
+      
+      <tag>Hexo</tag>
+      
+      <tag>Hugo</tag>
+      
+    </tags>
+    
+  </entry>
+  
+  
+  
+  
+</search>
